@@ -22,7 +22,14 @@ function modelReady() {
 
 function draw() {
   background(0); // 黑色背景
+
+  // 翻轉畫布
+  push();
+  translate(width, 0); // 將畫布的原點移動到右上角
+  scale(-1, 1); // 水平翻轉畫布
   image(video, 0, 0, width, height); // 在畫布上顯示攝影機畫面
+  pop();
+
   drawLips(); // 繪製嘴唇
 }
 

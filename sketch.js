@@ -4,32 +4,32 @@ let predictions = [];
 const lipPoints = [409, 270, 269, 267, 0, 37, 39, 40, 185, 61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291];
 
 function setup() {
-  createCanvas(640, 480); // 調整畫布大小
-  video = createCapture(VIDEO);
-  video.size(width, height); // 設置與畫布相同大小
-  video.hide();
+  createCanvas(640, 480); // 創建畫布
+  video = createCapture(VIDEO); // 啟用攝影機
+  video.size(width, height); // 設置攝影機大小與畫布一致
+  video.hide(); // 隱藏原始攝影機畫面（我們會在畫布上繪製）
 
-  facemesh = ml5.facemesh(video, modelReady);
+  facemesh = ml5.facemesh(video, modelReady); // 加載 Facemesh 模型
   facemesh.on("predict", (results) => {
-    predictions = results;
+    predictions = results; // 儲存偵測結果
   });
 }
 
 function modelReady() {
-  console.log("Facemesh model loaded!");
+  console.log("Facemesh model loaded!"); // 確認模型已加載
 }
 
 function draw() {
   background(0); // 黑色背景
-  image(video, 0, 0, width, height); // 顯示影像
-  drawLips();
+  image(video, 0, 0, width, height); // 在畫布上顯示攝影機畫面
+  drawLips(); // 繪製嘴唇
 }
 
 function drawLips() {
   if (predictions.length > 0) {
-    const keypoints = predictions[0].scaledMesh;
+    const keypoints = predictions[0].scaledMesh; // 獲取臉部特徵點
 
-    stroke(255, 0, 0); // 紅色
+    stroke(255, 0, 0); // 紅色線條
     strokeWeight(3); // 線條粗細為3
     noFill();
 

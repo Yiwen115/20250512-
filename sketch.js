@@ -24,65 +24,58 @@ function modelReady() {
 
 function draw() {
   background(0); // 黑色背景
-
-  // 翻轉畫布
-  push();
-  translate(width, 0); // 將畫布的原點移動到右上角
-  scale(-1, 1); // 水平翻轉畫布
   image(video, 0, 0, width, height); // 在畫布上顯示攝影機畫面
-  pop();
 
-  drawLips(); // 繪製嘴唇
-  drawEyes(); // 繪製眼睛
+  // 偵測結果檢查
+  if (predictions.length > 0) {
+    drawLips(); // 繪製嘴唇
+    drawEyes(); // 繪製眼睛
+  } else {
+    console.log("No face detected"); // 如果沒有偵測到臉部，輸出提示
+  }
 }
 
 function drawLips() {
-  if (predictions.length > 0) {
-    const keypoints = predictions[0].scaledMesh; // 獲取臉部特徵點
+  const keypoints = predictions[0].scaledMesh; // 獲取臉部特徵點
 
-    stroke(255, 0, 0); // 紅色線條
-    strokeWeight(3); // 線條粗細為3
-    noFill();
+  stroke(255, 0, 0); // 紅色線條
+  strokeWeight(3); // 線條粗細為3
+  noFill();
 
-    beginShape();
-    for (let i = 0; i < lipPoints.length; i++) {
-      const pointIndex = lipPoints[i];
-      if (keypoints[pointIndex]) { // 確保點存在
-        const [x, y] = keypoints[pointIndex]; // 獲取嘴唇點的座標
-        vertex(x, y); // 在嘴唇點繪製頂點
-      }
+  beginShape();
+  for (let i = 0; i < lipPoints.length; i++) {
+    const pointIndex = lipPoints[i];
+    if (keypoints[pointIndex]) { // 確保點存在
+      const [x, y] = keypoints[pointIndex]; // 獲取嘴唇點的座標
+      vertex(x, y); // 在嘴唇點繪製頂點
     }
-    endShape(CLOSE); // 將最後一點與第一點連接
   }
+  endShape(CLOSE); // 將最後一點與第一點連接
 }
 
 function drawEyes() {
-  if (predictions.length > 0) {
-    const keypoints = predictions[0].scaledMesh; // 獲取臉部特徵點
+  const keypoints = predictions[0].scaledMesh; // 獲取臉部特徵點
 
-    stroke(255, 0, 0); // 紅色線條
-    strokeWeight(3); // 線條粗細為3
+  stroke(255, 0, 0); // 紅色線條
+  strokeWeight(3); // 線條粗細為3
 
-    // 繪製左眼
-    for (let i = 0; i < leftEyePoints.length - 1; i++) {
-      const [x1, y1] = keypoints[leftEyePoints[i]];
-      const [x2, y2] = keypoints[leftEyePoints[i + 1]];
-      line(x1, y1, x2, y2); // 繪製兩點之間的線
-    }
-    // 將左眼最後一點與第一點連接
-    const [lx1, ly1] = keypoints[leftEyePoints[0]];
-    const [lx2, ly2] = keypoints[leftEyePoints[leftEyePoints.length - 1]];
-    line(lx1, ly1, lx2, ly2);
-
-    // 繪製右眼
-    for (let i = 0; i < rightEyePoints.length - 1; i++) {
-      const [x1, y1] = keypoints[rightEyePoints[i]];
-      const [x2, y2] = keypoints[rightEyePoints[i + 1]];
-      line(x1, y1, x2, y2); // 繪製兩點之間的線
-    }
-    // 將右眼最後一點與第一點連接
-    const [rx1, ry1] = keypoints[rightEyePoints[0]];
-    const [rx2, ry2] = keypoints[rightEyePoints[rightEyePoints.length - 1]];
-    line(rx1, ry1, rx2, ry2);
+  // 繪製左眼
+  for (let i = 0; i < leftEyePoints.length - 1; i++) {
+    const [x1, y1] = keypoints[leftEyePoints[i]];
+    const [x2, y2] = keypoints[leftEyePoints[i + 1]];
+    line(x1, y1, x2, y2); // 繪製兩點之間的線
   }
+  const [lx1, ly1] = keypoints[leftEyePoints[0]];
+  const [lx2, ly2] = keypoints[leftEyePoints[leftEyePoints.length - 1]];
+  line(lx1, ly1, lx2, ly2); // 將左眼最後一點與第一點連接
+
+  // 繪製右眼
+  for (let i = 0; i < rightEyePoints.length - 1; i++) {
+    const [x1, y1] = keypoints[rightEyePoints[i]];
+    const [x2, y2] = keypoints[rightEyePoints[i + 1]];
+    line(x1, y1, x2, y2); // 繪製兩點之間的線
+  }
+  const [rx1, ry1] = keypoints[rightEyePoints[0]];
+  const [rx2, ry2] = keypoints[rightEyePoints[rightEyePoints.length - 1]];
+  line(rx1, ry1, rx2, ry2); // 將右眼最後一點與第一點連接
 }

@@ -38,11 +38,8 @@ function drawLips() {
     for (let i = 0; i < lipPoints.length; i++) {
       const pointIndex = lipPoints[i];
       if (keypoints[pointIndex]) { // 確保點存在
-        // 獲取嘴唇點的座標，並調整比例和偏移
-        const [x, y] = keypoints[pointIndex];
-        const adjustedX = x * (width / video.width); // 調整 X 座標比例
-        const adjustedY = y * (height / video.height); // 調整 Y 座標比例
-        vertex(adjustedX, adjustedY); // 在嘴唇點繪製頂點
+        const [x, y] = keypoints[pointIndex]; // 獲取嘴唇點的座標
+        vertex(x, y); // 在嘴唇點繪製頂點
       }
     }
     endShape(CLOSE); // 將最後一點與第一點連接

@@ -8,7 +8,6 @@ function setup() {
   video = createCapture(VIDEO); // 啟用攝影機
   video.size(width, height); // 設置攝影機大小與畫布一致
   video.hide(); // 隱藏原始攝影機畫面（我們會在畫布上繪製）
-  video.style('transform', 'scale(-1, 1)'); // 水平翻轉影像，避免翻轉
 
   facemesh = ml5.facemesh(video, modelReady); // 加載 Facemesh 模型
   facemesh.on("predict", (results) => {
@@ -23,11 +22,7 @@ function modelReady() {
 
 function draw() {
   background(0); // 黑色背景
-  push();
-  translate(width, 0); // 翻轉畫布
-  scale(-1, 1); // 水平翻轉畫布
   image(video, 0, 0, width, height); // 在畫布上顯示攝影機畫面
-  pop();
   drawLips(); // 繪製嘴唇
 }
 
@@ -37,16 +32,16 @@ function drawLips() {
 
     stroke(255, 0, 0); // 紅色線條
     strokeWeight(3); // 線條粗細為3
+    noFill();
 
-    for (let i = 0; i < lipPoints.length - 1; i++) {
-      const [x1, y1] = keypoints[lipPoints[i]]; // 獲取當前點的座標
-      const [x2, y2] = keypoints[lipPoints[i + 1]]; // 獲取下一點的座標
-      line(x1, y1, x2, y2); // 繪製兩點之間的線
+    beginShape();
+    for (let i = 0; i < lipPoints.length; i++) {
+      const pointIndex = lipPoints[i];
+      if (keypoints[pointIndex]) { // 確保點存在
+        const [x, y] = keypoints[pointIndex]; // 獲取嘴唇點的座標
+        vertex(x, y); // 在嘴唇點繪製頂點
+      }
     }
-
-    // 將最後一點與第一點連接
-    const [xStart, yStart] = keypoints[lipPoints[0]];
-    const [xEnd, yEnd] = keypoints[lipPoints[lipPoints.length - 1]];
-    line(xStart, yStart, xEnd, yEnd);
+    endShape(CLOSE); // 將最後一點與第一點連接
   }
 }

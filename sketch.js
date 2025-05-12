@@ -6,7 +6,7 @@ const leftEyePoints = [133, 173, 157, 158, 159, 160, 161, 246, 33, 7, 163, 144, 
 const rightEyePoints = [263, 466, 388, 387, 386, 385, 384, 398, 362, 382, 381, 380, 374, 373, 390, 249];
 
 function setup() {
-  createCanvas(640, 480); // 創建畫布
+  createCanvas(windowWidth, windowHeight); // 動態設置畫布大小
   video = createCapture(VIDEO); // 啟用攝影機
   video.size(width, height); // 設置攝影機大小與畫布一致
   video.hide(); // 隱藏原始攝影機畫面（我們會在畫布上繪製）
@@ -36,46 +36,70 @@ function draw() {
 }
 
 function drawLips() {
-  const keypoints = predictions[0].scaledMesh; // 獲取臉部特徵點
+  if (predictions.length > 0) {
+    const keypoints = predictions[0].scaledMesh; // 獲取臉部特徵點
 
-  stroke(255, 0, 0); // 紅色線條
-  strokeWeight(3); // 線條粗細為3
-  noFill();
+    stroke(255, 0, 0); // 紅色線條
+    strokeWeight(3); // 線條粗細為3
+    noFill();
 
-  beginShape();
-  for (let i = 0; i < lipPoints.length; i++) {
-    const pointIndex = lipPoints[i];
-    if (keypoints[pointIndex]) { // 確保點存在
-      const [x, y] = keypoints[pointIndex]; // 獲取嘴唇點的座標
-      vertex(x, y); // 在嘴唇點繪製頂點
+    beginShape();
+    for (let i = 0; i < lipPoints.length; i++) {
+      const pointIndex = lipPoints[i];
+      if (keypoints[pointIndex]) { // 確保點存在
+        const [x, y] = keypoints[pointIndex];
+        const adjustedX = x * (width / video.width); // 映射 X 座標到畫布
+        const adjustedY = y * (height / video.height); // 映射 Y 座標到畫布
+        vertex(adjustedX, adjustedY); // 在嘴唇點繪製頂點
+      }
     }
+    endShape(CLOSE); // 將最後一點與第一點連接
   }
-  endShape(CLOSE); // 將最後一點與第一點連接
 }
 
 function drawEyes() {
-  const keypoints = predictions[0].scaledMesh; // 獲取臉部特徵點
+  if (predictions.length > 0) {
+    const keypoints = predictions[0].scaledMesh; // 獲取臉部特徵點
 
-  stroke(255, 0, 0); // 紅色線條
-  strokeWeight(3); // 線條粗細為3
+    stroke(255, 0, 0); // 紅色線條
+    strokeWeight(3); // 線條粗細為3
 
-  // 繪製左眼
-  for (let i = 0; i < leftEyePoints.length - 1; i++) {
-    const [x1, y1] = keypoints[leftEyePoints[i]];
-    const [x2, y2] = keypoints[leftEyePoints[i + 1]];
-    line(x1, y1, x2, y2); // 繪製兩點之間的線
+    // 繪製左眼
+    for (let i = 0; i < leftEyePoints.length - 1; i++) {
+      const [x1, y1] = keypoints[leftEyePoints[i]];
+      const [x2, y2] = keypoints[leftEyePoints[i + 1]];
+      const adjustedX1 = x1 * (width / video.width);
+      const adjustedY1 = y1 * (height / video.height);
+      const adjustedX2 = x2 * (width / video.width);
+      const adjustedY2 = y2 * (height / video.height);
+      line(adjustedX1, adjustedY1, adjustedX2, adjustedY2); // 繪製兩點之間的線
+    }
+    const [lx1, ly1] = keypoints[leftEyePoints[0]];
+    const [lx2, ly2] = keypoints[leftEyePoints[leftEyePoints.length - 1]];
+    line(
+      lx1 * (width / video.width),
+      ly1 * (height / video.height),
+      lx2 * (width / video.width),
+      ly2 * (height / video.height)
+    ); // 將左眼最後一點與第一點連接
+
+    // 繪製右眼
+    for (let i = 0; i < rightEyePoints.length - 1; i++) {
+      const [x1, y1] = keypoints[rightEyePoints[i]];
+      const [x2, y2] = keypoints[rightEyePoints[i + 1]];
+      const adjustedX1 = x1 * (width / video.width);
+      const adjustedY1 = y1 * (height / video.height);
+      const adjustedX2 = x2 * (width / video.width);
+      const adjustedY2 = y2 * (height / video.height);
+      line(adjustedX1, adjustedY1, adjustedX2, adjustedY2); // 繪製兩點之間的線
+    }
+    const [rx1, ry1] = keypoints[rightEyePoints[0]];
+    const [rx2, ry2] = keypoints[rightEyePoints[rightEyePoints.length - 1]];
+    line(
+      rx1 * (width / video.width),
+      ry1 * (height / video.height),
+      rx2 * (width / video.width),
+      ry2 * (height / video.height)
+    ); // 將右眼最後一點與第一點連接
   }
-  const [lx1, ly1] = keypoints[leftEyePoints[0]];
-  const [lx2, ly2] = keypoints[leftEyePoints[leftEyePoints.length - 1]];
-  line(lx1, ly1, lx2, ly2); // 將左眼最後一點與第一點連接
-
-  // 繪製右眼
-  for (let i = 0; i < rightEyePoints.length - 1; i++) {
-    const [x1, y1] = keypoints[rightEyePoints[i]];
-    const [x2, y2] = keypoints[rightEyePoints[i + 1]];
-    line(x1, y1, x2, y2); // 繪製兩點之間的線
-  }
-  const [rx1, ry1] = keypoints[rightEyePoints[0]];
-  const [rx2, ry2] = keypoints[rightEyePoints[rightEyePoints.length - 1]];
-  line(rx1, ry1, rx2, ry2); // 將右眼最後一點與第一點連接
 }

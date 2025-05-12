@@ -13,6 +13,7 @@ function setup() {
   facemesh.on("predict", (results) => {
     predictions = results; // 儲存偵測結果
   });
+  background(200); // 灰色背景
 }
 
 function modelReady() {
